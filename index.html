@@ -3,27 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>お品書きエディタ (v12)</title>
+    <title>お品書きエディタ (v13)</title> <!-- (v13) タイトル変更 -->
     
-    <!-- (v12) 3種類のフォントを読み込む (しっぽり明朝を削除) -->
+    <!-- ... (v12) 3種類のフォントを読み込む ... -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
-    <!-- <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet"> --> <!-- (v13) 削除 -->
     <link href="https://fonts.googleapis.com/css2?family=Ten+Mincho&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&display=swap" rel="stylesheet"> <!-- (v12) 筆文字フォント追加 -->
+    <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&display=swap" rel="stylesheet">
     
+    <!-- ... (v12) ライブラリ読み込み ... -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        /* (v12) フォントの定義を追加 */
+        /* ... (v12) フォントの定義 ... */
         .font-noto { font-family: 'Noto Serif JP', serif; }
-        /* .font-shippori { font-family: 'Shippori Mincho', serif; } */ /* (v13) 削除 */
         .font-ten { font-family: 'Ten Mincho', serif; }
-        .font-yuji { font-family: 'Yuji Syuku', serif; } /* (v12) 筆文字フォント追加 */
+        .font-yuji { font-family: 'Yuji Syuku', serif; }
+
+        /* --- (v13) h2 背景画像用のスタイル --- */
+        .menu-category h2 {
+            position: relative; /* 疑似要素の基準点 */
+            z-index: 1; /* テキストを手前に */
+        }
+        .menu-category h2::before {
+            content: '';
+            position: absolute;
+            z-index: -1; /* テキストの背後に */
+            
+            background-image: url('22691375.png'); /* アップロードされた画像 */
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: contain; /* サイズはJSで指定したコンテナに収める */
+            
+            opacity: 0.7; /* 透明度 70% */
+            
+            /* サイズと位置はJSで設定 */
+            width: var(--h2-bg-size, 24px); /* JSからの変数 (フォールバック値) */
+            height: var(--h2-bg-size, 24px);
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%); /* 上下中央揃え */
+        }
+        /* --- (v13) スタイルここまで --- */
+
 
         /* --- 基本レイアウト --- */
+        /* ... (v12) 変更なし ... */
         body {
             font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
             display: flex; flex-direction: column; height: 100vh;
@@ -47,6 +74,7 @@
         }
 
         /* --- フォームUIスタイル --- */
+        /* ... (v12) 変更なし ... */
         .form-input {
             width: 100%; border: 1px solid #ccc; border-radius: 6px; padding: 8px 12px;
         }
@@ -166,9 +194,8 @@
                         <div class="flex items-center gap-2 mt-1">
                             <select id="form-font-family" class="form-select">
                                 <option value="'Noto Serif JP', serif">Noto Serif JP</option>
-                                <!-- <option value="'Shippori Mincho', serif">しっぽり明朝</option> --> <!-- (v13) 削除 -->
                                 <option value="'Ten Mincho', serif">貂明朝</option>
-                                <option value="'Yuji Syuku', serif">Yuji Syuku (筆)</option> <!-- (v12) 筆文字フォント追加 -->
+                                <option value="'Yuji Syuku', serif">Yuji Syuku (筆)</option>
                             </select>
                         </div>
                     </div>
@@ -344,13 +371,14 @@
         };
 
         // --- HTML要素を取得 (v11 変更点) ---
+        // ... (v12) 変更なし ...
         const previewWrapper = document.getElementById('preview-wrapper');
         const canvasEl = document.getElementById('canvas');
         const previewContent = document.getElementById('canvas-content');
         const formTitle = document.getElementById('form-title');
         const formCanvasWidth = document.getElementById('form-canvas-width');
         const formCanvasHeight = document.getElementById('form-canvas-height');
-        const formFontFamily = document.getElementById('form-font-family'); // (v11)
+        const formFontFamily = document.getElementById('form-font-family');
         const categoriesFormList = document.getElementById('categories-form-list');
         const addCategoryBtn = document.getElementById('add-category-btn');
         const deleteSelectedBtn = document.getElementById('delete-selected-btn');
@@ -358,6 +386,7 @@
         const exportPdfBtn = document.getElementById('export-pdf-btn');
 
         // === 1. キャンバスサイズ更新 (v11 変更点) ===
+        // ... (v12) 変更なし ...
         function updateCanvasStyle() {
             const styles = menuData.styles;
             
@@ -376,7 +405,7 @@
             canvasEl.style.height = `${heightPx}px`;
         }
 
-        // === 2. プレビュー内容生成 (v10から変更なし) ===
+        // === 2. プレビュー内容生成 (v13 変更点) ===
         function renderPreview() {
             previewContent.innerHTML = ''; 
             const h1 = document.createElement('h1');
@@ -397,6 +426,13 @@
                 h2.style.color = '#A4252A'; 
                 h2.style.fontSize = `${category.fontSizeH2}px`; 
                 h2.style.lineHeight = styles.lineHeightH2 + 'px'; 
+                
+                // --- (v13) 背景画像サイズとパディングを動的に設定 ---
+                const bgSize = category.fontSizeH2 * 1.2; // フォントサイズの1.2倍
+                h2.style.setProperty('--h2-bg-size', `${bgSize}px`); // CSS変数にセット
+                h2.style.paddingLeft = `${bgSize * 0.5}px`; // 画像サイズの半分をパディング
+                // --- (v13) 変更ここまで ---
+
                 section.appendChild(h2);
                 
                 category.items.forEach(item => {
@@ -411,6 +447,7 @@
         }
 
         // === 3. フォームを生成する関数 (v11 変更点) ===
+        // ... (v12) 変更なし ...
         function renderForm() {
             formTitle.value = menuData.title;
             const titleFontSizeDisplay = document.querySelector('#title-form-group .font-size-display');
@@ -482,6 +519,7 @@
         }
         
         // === 4. SortableJS (v10から変更なし) ===
+        // ... (v12) 変更なし ...
         function initSortable() {
             new Sortable(categoriesFormList, {
                 handle: '.cat-handle', animation: 150, ghostClass: 'sortable-ghost',
@@ -508,6 +546,7 @@
         }
 
         // === 5. 再描画 (v10から変更なし) ===
+        // ... (v12) 変更なし ...
         function renderAll() {
             updateCanvasStyle(); 
             renderPreview();     
@@ -515,11 +554,13 @@
         }
         
         // === 6. PDF出力関数 (v10から変更なし) ===
+        // ... (v12) 変更なし ...
         async function handleExportPDF() {
             exportPdfBtn.textContent = 'PDFを生成中...';
             exportPdfBtn.disabled = true;
 
             try {
+                // (v13) useCORS: true が重要です
                 const captureCanvas = await html2canvas(canvasEl, { 
                     scale: 2,
                     allowTaint: true, 
@@ -555,6 +596,7 @@
         }
 
         // === 7. イベントリスナー (v11 変更点) ===
+        // ... (v12) 変更なし ...
         function setupListeners() {
             
             // --- Inputイベント (v11 変更点) ---
@@ -755,5 +797,3 @@
     </script>
 </body>
 </html>
-
-
